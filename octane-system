@@ -1,0 +1,155 @@
+/*const app = document.getElementById("app");
+        const ctx = app.getContext("2d");
+        const app_width = app.width = window.innerWidth;
+        const app_height = app.height = window.innerHeight;
+
+        const viewJSON =
+        fetch('./canvas.json')
+            .then((response) => response.json())
+            .then((json) => { return json });
+
+        (async()=>
+        {
+            const strJSON = await viewJSON;
+            const App_JSON = strJSON["App"];
+            console.log(App_JSON[0]);
+
+            const createObject = [{
+                attr: [{
+                    id: null,
+                    class: null
+                }],
+                text: null,
+                style: [{
+                    x: 50,
+                    y: 50,
+                    width: 295,
+                    height: 1200,
+                    background: "green",
+                    borderRadius: 10
+                }],
+                child: []
+            }]
+
+            for (let i = 0; i < createObject.length; i++)
+            {
+                const prop_style = createObject[i].style[0];
+                ctx.fillStyle = `${prop_style.background}`;
+                ctx.fillRect(
+                    prop_style.x,
+                    prop_style.y,
+                    app_width - 100,
+                    prop_style.height
+                );
+            }
+        })();*/
+
+        // Main param scene
+        const app = document.getElementById("app");
+        const app_width = app.width = window.innerWidth;
+        const app_height = app.height = window.innerHeight;
+
+        const main = new Konva.Stage({
+            container: 'app',
+            width: app_width,
+            height: app_height,
+        });
+
+        const viewJSON =
+        fetch('./canvas.json')
+            .then((response) => response.json())
+            .then((json) => { return json });
+
+        (async ()=>
+        {
+            const jsonParse = await viewJSON;
+            console.log(jsonParse)
+        })();
+
+        const PADDING = 5;
+        const HEIGHT = 1240;
+
+        const layer = new Konva.Layer();
+        main.add(layer);
+
+        const rect1 = new Konva.Rect({
+            x: 20,
+            y: 20,
+            width: app_width - 40,
+            height: 1200,
+            fill: 'green',
+            cornerRadius: 5
+        });
+        layer.add(rect1);
+
+        // Create scrollbar
+        const scrollBar = new Konva.Layer();
+        main.add(scrollBar);
+
+        var verticalBar = new Konva.Rect({
+            width: 10,
+            height: 980,
+            fill: 'grey',
+            opacity: 0.3,
+            cornerRadius: 50,
+            x: main.width() - PADDING - 10,
+            y: PADDING,
+            draggable: true,
+            dragBoundFunc: function (pos)
+            {
+            pos.x = main.width() - PADDING - 10;
+            pos.y = Math.max(
+                Math.min(pos.y, main.height() - this.height() - PADDING),
+                PADDING
+            );
+            return pos;
+            },
+        });
+        scrollBar.add(verticalBar);
+
+        verticalBar.on("mouseenter", ()=>
+        {
+            main.container().style.cursor = 'pointer';
+        })
+
+        verticalBar.on("mouseleave", ()=>
+        {
+            main.container().style.cursor = 'default';
+        })
+
+        verticalBar.on('dragmove', function ()
+        {
+            const availableHeight =
+                main.height() - PADDING * 2 - verticalBar.height();
+            const delta = (verticalBar.y() - PADDING) / availableHeight;
+
+            layer.y(-(HEIGHT - main.height()) * delta);
+        });
+
+        main.on('wheel', function (e)
+        {
+            e.evt.preventDefault();
+            const dx = e.evt.deltaX;
+            const dy = e.evt.deltaY;
+
+            const minX = -(app_width - main.width());
+            const maxX = 0;
+
+            const x = Math.max(minX, Math.min(layer.x() - dx, maxX));
+
+            const minY = -(HEIGHT - main.height());
+            const maxY = 0;
+
+            const y = Math.max(minY, Math.min(layer.y() - dy, maxY));
+            layer.position({ x, y });
+
+            const availableHeight =
+                main.height() - PADDING * 2 - verticalBar.height();
+            const vy =
+                (layer.y() / (-HEIGHT + main.height())) * availableHeight + PADDING;
+            verticalBar.y(vy);
+        });
+
+        // Create app canvas
+        layer.cache();
+        main.add(layer);
