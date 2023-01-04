@@ -1,5 +1,5 @@
 {
-  "popap": function pop()
+  "popap" = function()
     print("Hello")
   end,
 }
