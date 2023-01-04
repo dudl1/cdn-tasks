@@ -1,5 +1,3 @@
 {
-  "popap" = function()
-    print("Hello")
-  end,
+  ["popap"] = 321
 }
