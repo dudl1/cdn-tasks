@@ -1,3 +1,5 @@
 {
-  "popap": 213
+  "popap": function pop()
+    print("Hello")
+  end,
 }
