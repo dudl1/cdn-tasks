@@ -3,3 +3,4 @@ function pos()
 	local b = 21
 	return a
 end
+return pos()
