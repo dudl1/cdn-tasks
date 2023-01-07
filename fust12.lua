@@ -1,3 +1,6 @@
+local style = {}
+
+function style: new(v, arg)
 	local arg = {v}
 	local jsonCurrent = arg[1]
 	
@@ -32,3 +35,6 @@
 	end
 	
 	return style
+end
+
+return style
